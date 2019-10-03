@@ -1,6 +1,6 @@
 
-#import "CleverSDK.h"
 #import <PocketSVG/PocketSVG.h>
+#import "CleverLoginButton.h"
 
 const CGFloat CleverLoginButtonBaseWidth = 240.0;
 const CGFloat CleverLoginButtonBaseHeight = 52.0;
@@ -35,7 +35,6 @@ const CGFloat CleverLoginButtonBaseHeight = 52.0;
 
     button.backgroundFill = backgroundFill;
     button.textAndIconFill = textAndIconFill;
-    [button addTarget:button action:@selector(loginButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     
     return button;
 }
@@ -64,10 +63,6 @@ const CGFloat CleverLoginButtonBaseHeight = 52.0;
     self.textImage.frame = self.bounds;
 }
 
-- (void)loginButtonPressed:(id)loginButton {
-    [CleverSDK login];
-}
-
 + (UIImage *)backgroundImageForButtonWithFill:(UIColor *)fill {
     CGFloat cornerRadius = 0.0;
     CGFloat scale = [UIScreen mainScreen].scale;
@@ -94,7 +89,6 @@ const CGFloat CleverLoginButtonBaseHeight = 52.0;
     UIGraphicsEndImageContext();
     return [image stretchableImageWithLeftCapWidth:cornerRadius topCapHeight:cornerRadius];
 }
-
 
 + (UIImage *)cleverIconWithSize:(CGSize)size color:(UIColor *)color {
     CGFloat scale = [UIScreen mainScreen].scale;
