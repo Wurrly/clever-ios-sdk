@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
   s.social_media_url  = "https://twitter.com/clever"
   s.documentation_url = "https://dev.clever.com/"
 
-  s.platform     = :ios, "9.0"
+  s.platform     = :ios, "12.0"
   s.requires_arc = true
 
   s.public_header_files = "CleverSDK/**/*.h"
