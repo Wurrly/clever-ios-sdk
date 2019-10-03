@@ -27,11 +27,11 @@
     return _sharedManager;
 }
 
-+ (void)startWithClientId:(NSString *)clientId
-              RedirectURI:(NSString *)redirectUri
-             loginHandler:(void (^)(NSURL * url))loginHandler
-           successHandler:(void (^)(NSString *code, BOOL validState))successHandler
-           failureHandler:(void (^)(NSString *errorMessage))failureHandler {
++ (void)startWithClientId:(NSString * _Nonnull)clientId
+              RedirectURI:(NSString * _Nonnull)redirectUri
+             loginHandler:(void (^_Nonnull)(NSURL * _Nonnull url))loginHandler
+           successHandler:(void (^_Nonnull)(NSString * _Nonnull code, BOOL validState))successHandler
+           failureHandler:(void (^_Nonnull)(NSString * _Nonnull errorMessage))failureHandler {
     CleverSDK *manager = [self sharedManager];
     manager.clientId = clientId;
     manager.alreadyMissedCode = NO;
@@ -62,7 +62,7 @@
     [self loginWithDistrictId:nil];
 }
 
-+ (void)loginWithDistrictId:(NSString *)districtId {
++ (void)loginWithDistrictId:(NSString * _Nullable)districtId {
     CleverSDK *manager = [self sharedManager];
     manager.state = [self generateRandomString:32];
     
@@ -75,7 +75,7 @@
     manager.loginHandler([NSURL URLWithString:webURLString]);
 }
 
-+ (BOOL)handleURL:(NSURL *)url {
++ (BOOL)handleURL:(NSURL * _Nonnull)url {
     CleverSDK *manager = [self sharedManager];
 
     NSURL *redirectURL = [NSURL URLWithString:manager.redirectUri];
