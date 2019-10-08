@@ -3,12 +3,12 @@
 @interface CleverSDK ()
 
 @property (nonatomic, strong) NSString *clientId;
-@property (nonatomic, strong) NSString *legacyIosClientId;
 @property (nonatomic, strong) NSString *redirectUri;
 
 @property (nonatomic, strong) NSString *state;
 @property (atomic, assign) BOOL alreadyMissedCode;
 
+@property (nonatomic, copy) void (^loginHandler)(NSURL *);
 @property (nonatomic, copy) void (^successHandler)(NSString *, BOOL);
 @property (nonatomic, copy) void (^failureHandler)(NSString *);
 
@@ -27,17 +27,18 @@
     return _sharedManager;
 }
 
-+ (void) startWithClientId:(NSString *)clientId LegacyIosClientId:(NSString *)legacyIosClientId RedirectURI:(NSString *)redirectUri successHandler:(void (^)(NSString *code, BOOL validState))successHandler failureHandler:(void (^)(NSString *errorMessage))failureHandler {
++ (void)startWithClientId:(NSString * _Nonnull)clientId
+              RedirectURI:(NSString * _Nonnull)redirectUri
+             loginHandler:(void (^_Nonnull)(NSURL * _Nonnull url))loginHandler
+           successHandler:(void (^_Nonnull)(NSString * _Nonnull code, BOOL validState))successHandler
+           failureHandler:(void (^_Nonnull)(NSString * _Nonnull errorMessage))failureHandler {
     CleverSDK *manager = [self sharedManager];
     manager.clientId = clientId;
     manager.alreadyMissedCode = NO;
-    manager.legacyIosClientId = legacyIosClientId;
     manager.redirectUri = redirectUri;
+    manager.loginHandler = loginHandler;
     manager.successHandler = successHandler;
     manager.failureHandler = failureHandler;
-}
-+ (void)startWithClientId:(NSString *)clientId RedirectURI:(NSString *)redirectUri successHandler:(void (^)(NSString *code, BOOL validState))successHandler failureHandler:(void (^)(NSString *errorMessage))failureHandler {
-    [self startWithClientId:clientId LegacyIosClientId:nil RedirectURI:redirectUri successHandler:successHandler failureHandler:failureHandler];
 }
 
 + (NSString *)generateRandomString:(int)length {
@@ -61,51 +62,29 @@
     [self loginWithDistrictId:nil];
 }
 
-+ (void)loginWithDistrictId:(NSString *)districtId {
++ (void)loginWithDistrictId:(NSString * _Nullable)districtId {
     CleverSDK *manager = [self sharedManager];
     manager.state = [self generateRandomString:32];
     
-    NSString *legacyIosRedirectURI = nil;
-    if (manager.legacyIosClientId != nil) {
-        legacyIosRedirectURI = [NSString stringWithFormat:@"clever-%@://oauth", manager.legacyIosClientId];
-    }
-    
     NSString *webURLString = [NSString stringWithFormat:@"https://clever.com/oauth/authorize?response_type=code&client_id=%@&redirect_uri=%@&state=%@&redo_login=true&confirmed=false", manager.clientId, manager.redirectUri, manager.state];
-    NSString *cleverAppURLString = [NSString stringWithFormat:@"com.clever://oauth/authorize?response_type=code&client_id=%@&redirect_uri=%@&state=%@&sdk_version=%@", manager.legacyIosClientId, legacyIosRedirectURI, manager.state, SDK_VERSION];
     
     if (districtId != nil) {
         webURLString = [NSString stringWithFormat:@"%@&district_id=%@", webURLString, districtId];
-        cleverAppURLString = [NSString stringWithFormat:@"%@&district_id=%@", cleverAppURLString, districtId];
     }
-    
-    // Switch to native Clever app if possible
-    if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:cleverAppURLString]] && manager.legacyIosClientId != nil) {
-        if (@available(iOS 10, *)) {
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:cleverAppURLString] options:@{} completionHandler:nil];
-        } else {
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:cleverAppURLString]];
-        }
-        return;
-    }
-    
-    if (@available(iOS 10, *)) {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:webURLString] options:@{} completionHandler:nil];
-    } else {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:webURLString]];
-    }
+
+    manager.loginHandler([NSURL URLWithString:webURLString]);
 }
 
-+ (BOOL)handleURL:(NSURL *)url {
++ (BOOL)handleURL:(NSURL * _Nonnull)url {
     CleverSDK *manager = [self sharedManager];
 
     NSURL *redirectURL = [NSURL URLWithString:manager.redirectUri];
 
-    if (!(
-        [url.scheme isEqualToString:[NSString stringWithFormat:@"clever-%@", manager.legacyIosClientId]] || (
+    if (! (
             [url.scheme isEqualToString:redirectURL.scheme] &&
             [url.host isEqualToString:redirectURL.host] &&
             [url.path isEqualToString:redirectURL.path]
-    ))) {
+    )) {
         return NO;
     }
     

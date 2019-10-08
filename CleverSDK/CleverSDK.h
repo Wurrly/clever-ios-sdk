@@ -1,18 +1,20 @@
+
 #import <Foundation/Foundation.h>
-#import "CleverLoginButton.h"
 
 #define SDK_VERSION @"iOS-2.0.0"
 
 @interface CleverSDK : NSObject
 
-+ (void)startWithClientId:(NSString *)clientId LegacyIosClientId:(NSString *)legacyIosClientId RedirectURI:(NSString *)redirectUri successHandler:(void (^)(NSString *code, BOOL validState))successHandler failureHandler:(void (^)(NSString *errorMessage))failureHandler;
++ (void)startWithClientId:(NSString * _Nonnull)clientId
+              RedirectURI:(NSString * _Nonnull)redirectUri
+             loginHandler:(void (^_Nonnull)(NSURL * _Nonnull url))loginHandler
+           successHandler:(void (^_Nonnull)(NSString * _Nonnull code, BOOL validState))successHandler
+           failureHandler:(void (^_Nonnull)(NSString * _Nonnull errorMessage))failureHandler;
 
-+ (void)startWithClientId:(NSString *)clientId RedirectURI:(NSString *)redirectUri successHandler:(void (^)(NSString *code, BOOL validState))successHandler failureHandler:(void (^)(NSString *errorMessage))failureHandler;
-
-+ (BOOL)handleURL:(NSURL *)url;
++ (BOOL)handleURL:(NSURL * _Nonnull)url;
 
 + (void)login;
 
-+ (void)loginWithDistrictId:(NSString *)districtId;
++ (void)loginWithDistrictId:(NSString * _Nullable)districtId;
 
 @end
