@@ -70,7 +70,7 @@
         legacyIosRedirectURI = [NSString stringWithFormat:@"clever-%@://oauth", manager.legacyIosClientId];
     }
     
-    NSString *webURLString = [NSString stringWithFormat:@"https://clever.com/oauth/authorize?response_type=code&client_id=%@&redirect_uri=%@&state=%@", manager.clientId, manager.redirectUri, manager.state];
+    NSString *webURLString = [NSString stringWithFormat:@"https://clever.com/oauth/authorize?response_type=code&client_id=%@&redirect_uri=%@&state=%@&redo_login=true&confirmed=false", manager.clientId, manager.redirectUri, manager.state];
     NSString *cleverAppURLString = [NSString stringWithFormat:@"com.clever://oauth/authorize?response_type=code&client_id=%@&redirect_uri=%@&state=%@&sdk_version=%@", manager.legacyIosClientId, legacyIosRedirectURI, manager.state, SDK_VERSION];
     
     if (districtId != nil) {
