@@ -1,5 +1,6 @@
-#import "CleverSDK.h"
+
 #import <PocketSVG/PocketSVG.h>
+#import "CleverLoginButton.h"
 
 const CGFloat CleverLoginButtonBaseWidth = 240.0;
 const CGFloat CleverLoginButtonBaseHeight = 52.0;
@@ -7,33 +8,43 @@ const CGFloat CleverLoginButtonBaseHeight = 52.0;
 @interface CleverLoginButton ()
 
 @property (nonatomic, strong) UIImageView *textImage;
-
-@property (nonatomic, strong) NSString *districtId;
+@property (nonatomic, strong) UIColor *backgroundFill;
+@property (nonatomic, strong) UIColor *textAndIconFill;
 
 @end
 
 @implementation CleverLoginButton
 
-+ (CleverLoginButton *)createLoginButton {
++ (CleverLoginButton *)createLoginButtonWithBackgroundFill:(UIColor *)backgroundFill
+                                           textAndIconFill:(UIColor *)textAndIconFill {
     CleverLoginButton *button = [CleverLoginButton buttonWithType:UIButtonTypeCustom];
     button.frame = CGRectMake(0, 0, CleverLoginButtonBaseWidth, CleverLoginButtonBaseHeight);
     
-    UIImage *bgImage = [CleverLoginButton backgroundImageForButton];
+    UIImage *bgImage = [CleverLoginButton backgroundImageForButtonWithFill:backgroundFill];
     [button setBackgroundImage:bgImage forState:UIControlStateNormal];
-    [button setImage:[CleverLoginButton cleverIconWithSize:button.bounds.size] forState:UIControlStateNormal];
+    [button setImage:[CleverLoginButton cleverIconWithSize:button.bounds.size color:textAndIconFill] forState:UIControlStateNormal];
     [button setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
     [button.layer setShadowColor:UIColor.blackColor.CGColor];
     [button.layer setShadowOpacity:0.25];
     [button.layer setShadowRadius:4.0];
     [button.layer setShadowOffset:CGSizeMake(-1.0, 1.0)];
     
-    button.textImage = [[UIImageView alloc] initWithImage:[CleverLoginButton textForButton:button.frame.size]];
+    button.textImage = [[UIImageView alloc] initWithImage:[CleverLoginButton textForButton:button.frame.size color:textAndIconFill]];
     button.textImage.frame = button.bounds;
     [button addSubview:button.textImage];
-    
-    [button addTarget:button action:@selector(loginButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+
+    button.backgroundFill = backgroundFill;
+    button.textAndIconFill = textAndIconFill;
     
     return button;
+}
+
++ (UIColor *)white {
+    return [UIColor whiteColor];
+}
+
++ (UIColor *)blue {
+    return [UIColor colorWithRed:(100.0/255.0) green:(134.0/255.0) blue:(248.0/255.0) alpha:1.0];
 }
 
 - (void)setOrigin:(CGPoint)origin {
@@ -48,23 +59,18 @@ const CGFloat CleverLoginButtonBaseHeight = 52.0;
     self.frame = frame;
     
     // need to adjust the text too
-    self.textImage.image = [CleverLoginButton textForButton:self.frame.size];
+    self.textImage.image = [CleverLoginButton textForButton:self.frame.size color:self.textAndIconFill];
     self.textImage.frame = self.bounds;
 }
 
-- (void)loginButtonPressed:(id)loginButton {
-    [CleverSDK login];
-}
-
-+ (UIImage *)backgroundImageForButton {
-    UIColor *color = [UIColor colorWithRed:(100.0/255.0) green:(134.0/255.0) blue:(248.0/255.0) alpha:1.0];
-    CGFloat cornerRadius = 4.0;
++ (UIImage *)backgroundImageForButtonWithFill:(UIColor *)fill {
+    CGFloat cornerRadius = 0.0;
     CGFloat scale = [UIScreen mainScreen].scale;
     
     CGFloat size = 1.0 + 2 * cornerRadius;
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(size, size), NO, scale);
     CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextSetFillColorWithColor(context, color.CGColor);
+    CGContextSetFillColorWithColor(context, fill.CGColor);
     CGMutablePathRef path = CGPathCreateMutable();
     CGPathMoveToPoint(path, NULL, cornerRadius + 1.0, 0.0);
     CGPathAddArcToPoint(path, NULL, size, 0.0, size, cornerRadius, cornerRadius);
@@ -84,8 +90,7 @@ const CGFloat CleverLoginButtonBaseHeight = 52.0;
     return [image stretchableImageWithLeftCapWidth:cornerRadius topCapHeight:cornerRadius];
 }
 
-
-+ (UIImage *)cleverIconWithSize:(CGSize)size {
++ (UIImage *)cleverIconWithSize:(CGSize)size color:(UIColor *)color {
     CGFloat scale = [UIScreen mainScreen].scale;
     UIGraphicsBeginImageContextWithOptions(size, NO, scale);
     CGContextRef context = UIGraphicsGetCurrentContext();
@@ -99,7 +104,7 @@ const CGFloat CleverLoginButtonBaseHeight = 52.0;
     CGContextAddRect(context, CGRectMake(46.0, 8.0, 0.5, size.height - 16.0));
     CGContextAddPath(context, cleverC);
     
-    CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
+    CGContextSetFillColorWithColor(context, color.CGColor);
     CGContextFillPath(context);
     CGPathRelease(cleverC);
     
@@ -108,7 +113,7 @@ const CGFloat CleverLoginButtonBaseHeight = 52.0;
     return image;
 }
 
-+ (UIImage *)textForButton:(CGSize)size {
++ (UIImage *)textForButton:(CGSize)size color:(UIColor *)color {
     CGFloat scale = [UIScreen mainScreen].scale;
     UIGraphicsBeginImageContextWithOptions(size, NO, scale);
     CGContextRef context = UIGraphicsGetCurrentContext();
@@ -122,7 +127,7 @@ const CGFloat CleverLoginButtonBaseHeight = 52.0;
     cleverText = CGPathCreateCopyByTransformingPath(cleverText, &moveTransform);
     
     CGContextAddPath(context, cleverText);
-    CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
+    CGContextSetFillColorWithColor(context, color.CGColor);
     CGContextFillPath(context);
     CGPathRelease(cleverText);
     
