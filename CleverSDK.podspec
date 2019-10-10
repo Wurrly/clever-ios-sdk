@@ -9,15 +9,13 @@
 
 Pod::Spec.new do |s|
   s.name              = "CleverSDK"
-  s.version           = File.read("VERSION")
+  s.version           = "2.1.0"
   s.summary           = "A simple iOS library to access Clever Instant Login"
   s.description       = "CleverSDK provides developers with a simple library to access Clever Instant Login."
-  s.homepage          = "https://github.com/Clever/ios-sdk"
+  s.homepage          = "https://github.com/Wurrly/clever-ios-sdk"
   s.license           = "Apache 2.0"
   s.authors           = { "Clever" => "tech-notify@clever.com" }
-  s.source            = { :git => "https://github.com/Clever/ios-sdk.git", :tag => s.version.to_s }
-  s.social_media_url  = "https://twitter.com/clever"
-  s.documentation_url = "https://dev.clever.com/"
+  s.source            = { :git => "https://github.com/Wurrly/clever-ios-sdk.git", :tag => s.version.to_s }
 
   s.platform     = :ios, "12.0"
   s.requires_arc = true

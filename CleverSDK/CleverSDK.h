@@ -1,8 +1,6 @@
 
 #import <Foundation/Foundation.h>
 
-#define SDK_VERSION @"iOS-2.0.0"
-
 @interface CleverSDK : NSObject
 
 + (void)startWithClientId:(NSString * _Nonnull)clientId
